@@ -229,6 +229,20 @@ class SkiLessonResourceTest {
     }
 
     @Test
+    void getInstructionsByLevel() {
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get("/skilessons/instructions/beginner")
+                .then()
+                .statusCode(200)
+                .body("size()", greaterThan(0))
+                .body("[0].title", notNullValue())
+                .body("[0].durationMinutes", greaterThan(0));
+    }
+
+
+    @Test
     void populateDatabase() {
         given()
                 .header("Authorization", "Bearer " + token)

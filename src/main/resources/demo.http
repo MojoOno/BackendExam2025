@@ -57,6 +57,8 @@ GET http://localhost:7070/api/skilessons/totalprice
 ###
 GET http://localhost:7070/api/skilessons/instructions/advanced
 
+###
+GET http://localhost:7070/api/skilessons/1/instructions/totalduration
 
 ###
 POST http://localhost:7070/api/skilessons/populate

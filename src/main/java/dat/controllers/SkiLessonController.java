@@ -12,6 +12,7 @@ import dat.service.SkiInstructionService;
 import dat.utils.Populator;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
+import io.javalin.http.NotFoundResponse;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.jetbrains.annotations.NotNull;
@@ -332,5 +333,29 @@ public class SkiLessonController implements IController, ISkiLessonController
             throw new ApiException(500, "Server error fetching instructions");
         }
     }
+
+    public void getTotalInstructionDurationByLessonId(Context ctx) {
+        try {
+            long id = ctx.pathParamAsClass("id", Long.class).get();
+            SkiLesson lesson = dao.getById(SkiLesson.class, id);
+
+            if (lesson == null) {
+                throw new NotFoundResponse("No ski lesson found with ID: " + id);
+            }
+
+            int totalDuration = skiInstructionService.getTotalDurationByLevel(lesson.getLevel());
+            TotalInstructionDurationDTO response = new TotalInstructionDurationDTO(
+                    lesson.getId(),
+                    lesson.getLevel(),
+                    totalDuration
+            );
+
+            ctx.status(200).json(response);
+        } catch (Exception e) {
+            logger.error("Error calculating total instruction duration", e);
+            throw new ApiException(500, "Server error calculating instruction duration");
+        }
+    }
+
 
 }

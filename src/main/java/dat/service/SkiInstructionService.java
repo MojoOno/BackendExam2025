@@ -27,4 +27,9 @@ public class SkiInstructionService {
             throw new RuntimeException("Failed to fetch ski instructions for level: " + level, e);
         }
     }
+
+    public int getTotalDurationByLevel(Level level) {
+        List<SkiInstructionDTO> instructions = getInstructionsByLevel(level);
+        return instructions.stream().mapToInt(SkiInstructionDTO::getDurationMinutes).sum();
+    }
 }

@@ -39,6 +39,7 @@ public class Routes
             get("/totalprice", skiLessonController::getTotalLessonPricePerInstructor, Roles.ANYONE);
             get("/{id}", skiLessonController::getById, Roles.ANYONE);
             get("/instructions/{level}", skiLessonController::getInstructionsByLevel, Roles.ANYONE);
+            get("/{id}/instructions/totalduration", skiLessonController::getTotalInstructionDurationByLessonId, Roles.ANYONE);
             post(skiLessonController::create, Roles.ADMIN);
             put("/{id}", skiLessonController::update, Roles.ADMIN);
             delete("/{id}", skiLessonController::delete, Roles.ADMIN);
