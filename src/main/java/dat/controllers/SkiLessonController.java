@@ -63,27 +63,37 @@ public class SkiLessonController implements IController, ISkiLessonController
                     .check(i -> i > 0, "id must be at least 0")
                     .getOrThrow((validator) -> new BadRequestResponse("Invalid id"));
 
-            SkiLesson skiLesson = dao.getLessonById(id);
+            SkiLesson skiLesson = dao.getById(SkiLesson.class, id);
 
             if (skiLesson == null)
             {
                 throw new BadRequestResponse("No skiLesson found with that ID");
             }
+            // Ternary if statement.
+            // If the instructor is not null, create a new InstructorDTO object from the instructorDTO else set it to null
+            InstructorDTO instructorDTO = skiLesson.getInstructor() != null
+                    ? new InstructorDTO(skiLesson.getInstructor())
+                    : null;
 
-            SkiLessonDTO skiLessonDTO = new SkiLessonDTO(skiLesson);
-            if (skiLesson.getInstructor() != null)
-            {
-                skiLessonDTO.setInstructor(new InstructorDTO(skiLesson.getInstructor()));
-            }
+            List<SkiInstructionDTO> instructions = skiInstructionService.getInstructionsByLevel(skiLesson.getLevel());
 
-            ctx.status(200).json(skiLessonDTO);
+            SkiLessonWithInstructionsDTO dto = new SkiLessonWithInstructionsDTO(skiLesson, instructions);
+            dto.setInstructor(instructorDTO);
+
+            ctx.status(200).json(dto);
         }
-        catch (Exception ex)
+        catch (DaoException ex)
         {
             logger.error("Error getting entity", ex);
             throw new ApiException(404, "No content found for this request");
         }
+        catch (Exception ex)
+        {
+            logger.error("Error getting ski lesson by id", ex);
+            throw new ApiException(500, "Server error fetching ski lesson with instructions");
+        }
     }
+
 
     // Create a new lesson
     @Override
@@ -301,17 +311,23 @@ public class SkiLessonController implements IController, ISkiLessonController
     }
 
     // fetching instructions by level from the ski instruction service
-    public void getInstructionsByLevel(Context ctx) {
-        try {
+    public void getInstructionsByLevel(Context ctx)
+    {
+        try
+        {
             String levelParam = ctx.pathParam("level");
             Level level = Level.valueOf(levelParam);
 
             List<SkiInstructionDTO> instructions = skiInstructionService.getInstructionsByLevel(level);
 
             ctx.status(200).json(instructions);
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e)
+        {
             throw new BadRequestResponse("Invalid level. Must be beginner, intermediate or advanced.");
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             logger.error("Failed to get instructions by level", e);
             throw new ApiException(500, "Server error fetching instructions");
         }
