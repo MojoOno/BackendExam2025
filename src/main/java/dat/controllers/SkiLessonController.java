@@ -67,7 +67,6 @@ public class SkiLessonController implements IController, ISkiLessonController
                     .getOrThrow((validator) -> new BadRequestResponse("Invalid id"));
 
             SkiLesson skiLesson = dao.getById(SkiLesson.class, id);
-
             if (skiLesson == null)
             {
                 throw new BadRequestResponse("No skiLesson found with that ID");
@@ -78,7 +77,6 @@ public class SkiLessonController implements IController, ISkiLessonController
                     : null;
 
             List<SkiInstructionDTO> instructions = skiInstructionService.getInstructionsByLevel(skiLesson.getLevel());
-
             SkiLessonWithInstructionsDTO dto = new SkiLessonWithInstructionsDTO(skiLesson, instructions);
             dto.setInstructor(instructorDTO);
 
@@ -104,6 +102,7 @@ public class SkiLessonController implements IController, ISkiLessonController
             SkiLessonDTO incomingTrip = ctx.bodyAsClass(SkiLessonDTO.class);
             SkiLesson skiLesson = new SkiLesson(incomingTrip);
             SkiLesson createdSkiLesson = dao.createLesson(skiLesson);
+
             ctx.status(201).json(new SkiLessonDTO(createdSkiLesson));
         }
         catch (DaoException ex)
@@ -125,6 +124,7 @@ public class SkiLessonController implements IController, ISkiLessonController
         {
             long id = ctx.pathParamAsClass("id", Long.class).check(i -> i > 0, "id must be at least 0")
                     .getOrThrow((validator) -> new BadRequestResponse("Invalid id"));
+
             SkiLessonDTO incomingTrip = ctx.bodyAsClass(SkiLessonDTO.class);
             SkiLesson skiLessonToUpdate = dao.getLessonById(id);
             if (incomingTrip.getName() != null) skiLessonToUpdate.setName(incomingTrip.getName());
@@ -137,6 +137,7 @@ public class SkiLessonController implements IController, ISkiLessonController
 
             SkiLesson updatedSkiLesson = dao.updateLesson(skiLessonToUpdate);
             SkiLessonDTO returnedTrip = new SkiLessonDTO(updatedSkiLesson);
+
             ctx.status(200).json(returnedTrip);
         }
         catch (DaoException ex)
@@ -158,7 +159,9 @@ public class SkiLessonController implements IController, ISkiLessonController
         {
             long id = ctx.pathParamAsClass("id", Long.class).check(i -> i > 0, "id must be at least 0")
                     .getOrThrow((validator) -> new BadRequestResponse("Invalid id"));
+
             dao.deleteLesson(id);
+
             ctx.status(204);
         }
         catch (DaoException ex)
@@ -174,53 +177,27 @@ public class SkiLessonController implements IController, ISkiLessonController
     }
 
     @Override
-    public void getLessonsByInstructor(@NotNull Context ctx)
-    {
-        try
-        {
-            long id = ctx.pathParamAsClass("id", Long.class).check(i -> i > 0, "id must be at least 0")
-                    .getOrThrow((validator) -> new BadRequestResponse("Invalid id"));
-            Instructor instructor = dao.getById(Instructor.class, id);
-            ctx.status(200).json(instructor.getSkiLessons());
-        }
-        catch (DaoException ex)
-        {
-            logger.error("Error getting lessons", ex);
-            throw new ApiException(404, "No content found for this request");
-        }
-        catch (Exception ex)
-        {
-            logger.error("Error getting lessons by instructor", ex);
-            throw new ApiException(500, "Server error getting ski lessons by instructor");
-        }
-    }
-
-    @Override
     public void addLessonToInstructor(@NotNull Context ctx)
     {
         try
         {
-            logger.info("Adding skiLesson to instructor");
-
             long instructorId = ctx.pathParamAsClass("instructorId", Long.class)
                     .check(i -> i > 0, "instructorId must be at least 0")
                     .getOrThrow((validator) -> new BadRequestResponse("Invalid instructor id"));
+
             long lessonId = ctx.pathParamAsClass("lessonId", Long.class)
                     .check(i -> i > 0, "lessonId must be at least 0")
                     .getOrThrow((validator) -> new BadRequestResponse("Invalid skiLesson id"));
 
             Instructor instructor = dao.getById(Instructor.class, instructorId);
             SkiLesson skiLesson = dao.getLessonById(lessonId);
-
             if (instructor == null || skiLesson == null)
             {
                 throw new BadRequestResponse("Instructor or SkiLesson not found");
             }
 
-            instructor.addLesson(skiLesson);
+            dao.addInstructorToSkiLesson(instructor, skiLesson);
             skiLesson.setInstructor(instructor);
-
-            dao.update(instructor);
             dao.update(skiLesson);
 
             ctx.status(200).json(instructor.getSkiLessons());
@@ -329,7 +306,6 @@ public class SkiLessonController implements IController, ISkiLessonController
         {
             String levelParam = ctx.pathParam("level");
             Level level = Level.valueOf(levelParam);
-
             List<SkiInstructionDTO> instructions = skiInstructionService.getInstructionsByLevel(level);
 
             ctx.status(200).json(instructions);

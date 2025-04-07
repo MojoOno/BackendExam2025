@@ -5,7 +5,7 @@ GET http://localhost:7070/api/routes
 GET http://localhost:7070/api/skilessons
 
 ###
-GET localhost:7070/api/skilessons/3
+GET localhost:7070/api/skilessons/7
 
 ###
 POST http://localhost:7070/api/skilessons
@@ -58,7 +58,7 @@ GET http://localhost:7070/api/skilessons/totalprice
 GET http://localhost:7070/api/skilessons/instructions/advanced
 
 ###
-GET http://localhost:7070/api/skilessons/1/instructions/totalduration
+GET http://localhost:7070/api/skilessons/4/instructions/totalduration
 
 ###
 POST http://localhost:7070/api/skilessons/populate

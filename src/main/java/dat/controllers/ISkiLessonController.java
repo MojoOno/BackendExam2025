@@ -4,9 +4,10 @@ import io.javalin.http.Context;
 
 public interface ISkiLessonController
 {
-    void getLessonsByInstructor(Context context);
-    void addLessonToInstructor(Context context);
+    void addLessonToInstructor(Context ctx);
     void filterLessonsByLevel(Context ctx);
     void getTotalLessonPricePerInstructor(Context ctx);
     void populate(Context ctx);
+    void getInstructionsByLevel(Context ctx);
+    void getTotalInstructionDurationByLessonId(Context ctx);
 }

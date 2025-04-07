@@ -66,7 +66,6 @@ public class UserAccount
 
     public void removeRole(String roleName)
     {
-        //roles.remove(Roles.valueOf(roleName.toUpperCase()));
         roles.removeIf(r -> r.toString().equals(roleName));
     }
 

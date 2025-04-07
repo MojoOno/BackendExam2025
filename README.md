@@ -574,7 +574,7 @@ Everything else has been set to `ANYONE` for the purpose of making testing my pr
 
 If this was a "real" application, further security would be added to the endpoints, but as I just want to show that security is implemented, I’ve only added the ADMIN to those three endpoints.
 
-> ✅ To test this:
+>    To test this:
 > 1. Run the `populate` endpoint to populate the DB with entities
 > 2. Go to `demoSecurity.http` and run the `register` and `login` endpoints
 > 3. Go back to `demo.http` and run the `create`, `update` and `delete` endpoints

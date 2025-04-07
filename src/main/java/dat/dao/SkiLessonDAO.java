@@ -55,7 +55,7 @@ public class SkiLessonDAO extends GenericDAO implements ISkiLessonInstructorDAO
         return instructor.getSkiLessons();
     }
 
-    // Assign a instructor to a skiLesson
+    // Assign an instructor to a skiLesson
     @Override
     public void addInstructorToSkiLesson(Instructor instructor, SkiLesson skiLesson)
     {
@@ -63,7 +63,7 @@ public class SkiLessonDAO extends GenericDAO implements ISkiLessonInstructorDAO
         update(instructor);
     }
 
-    // Remove a skiLesson from a instructor and update both entities
+    // Remove a skiLesson from an instructor and update both entities
     @Override
     public SkiLesson removeLesson(Instructor instructor, SkiLesson skiLesson)
     {
