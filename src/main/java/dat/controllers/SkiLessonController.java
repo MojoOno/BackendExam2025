@@ -39,7 +39,6 @@ public class SkiLessonController implements IController, ISkiLessonController
         this.dao = dao;
     }
 
-    // Get all lessons
     @Override
     public void getAll(Context ctx)
     {
@@ -47,21 +46,24 @@ public class SkiLessonController implements IController, ISkiLessonController
         {
             ctx.status(200).json(dao.getAllLessons());
         }
-        catch (Exception ex)
+        catch (DaoException ex)
         {
-            logger.error("Error getting entities", ex);
+            logger.error("Error getting entity", ex);
             throw new ApiException(404, "No content found for this request");
+        }
+        catch (Exception e)
+        {
+            logger.error("Error getting all ski lessons", e);
+            throw new ApiException(500, "Server error getting ski lessons");
         }
     }
 
-    // Get lesson by ID
     @Override
     public void getById(Context ctx)
     {
         try
         {
-            long id = ctx.pathParamAsClass("id", Long.class)
-                    .check(i -> i > 0, "id must be at least 0")
+            long id = ctx.pathParamAsClass("id", Long.class).check(i -> i > 0, "id must be at least 0")
                     .getOrThrow((validator) -> new BadRequestResponse("Invalid id"));
 
             SkiLesson skiLesson = dao.getById(SkiLesson.class, id);
@@ -70,8 +72,7 @@ public class SkiLessonController implements IController, ISkiLessonController
             {
                 throw new BadRequestResponse("No skiLesson found with that ID");
             }
-            // Ternary if statement.
-            // If the instructor is not null, create a new InstructorDTO object from the instructorDTO else set it to null
+
             InstructorDTO instructorDTO = skiLesson.getInstructor() != null
                     ? new InstructorDTO(skiLesson.getInstructor())
                     : null;
@@ -95,8 +96,6 @@ public class SkiLessonController implements IController, ISkiLessonController
         }
     }
 
-
-    // Create a new lesson
     @Override
     public void create(Context ctx)
     {
@@ -107,21 +106,24 @@ public class SkiLessonController implements IController, ISkiLessonController
             SkiLesson createdSkiLesson = dao.createLesson(skiLesson);
             ctx.status(201).json(new SkiLessonDTO(createdSkiLesson));
         }
-        catch (Exception ex)
+        catch (DaoException ex)
         {
             logger.error("Error creating entity", ex);
             throw new ApiException(400, "Field ‘xxx’ is required");
         }
+        catch (Exception ex)
+        {
+            logger.error("Error creating entity", ex);
+            throw new ApiException(500, "Server error creating ski lesson");
+        }
     }
 
-    // Update an existing lesson
     @Override
     public void update(Context ctx)
     {
         try
         {
-            long id = ctx.pathParamAsClass("id", Long.class)
-                    .check(i -> i > 0, "id must be at least 0")
+            long id = ctx.pathParamAsClass("id", Long.class).check(i -> i > 0, "id must be at least 0")
                     .getOrThrow((validator) -> new BadRequestResponse("Invalid id"));
             SkiLessonDTO incomingTrip = ctx.bodyAsClass(SkiLessonDTO.class);
             SkiLesson skiLessonToUpdate = dao.getLessonById(id);
@@ -145,49 +147,54 @@ public class SkiLessonController implements IController, ISkiLessonController
         catch (Exception ex)
         {
             logger.error("Error updating SkiLesson", ex);
-            throw new ApiException(404, "No content found for this request");
+            throw new ApiException(500, "Server error updating ski lesson");
         }
     }
 
-    // Delete a lesson by ID
     @Override
     public void delete(Context ctx)
     {
         try
         {
-            long id = ctx.pathParamAsClass("id", Long.class)
-                    .check(i -> i > 0, "id must be at least 0")
+            long id = ctx.pathParamAsClass("id", Long.class).check(i -> i > 0, "id must be at least 0")
                     .getOrThrow((validator) -> new BadRequestResponse("Invalid id"));
             dao.deleteLesson(id);
             ctx.status(204);
         }
-        catch (Exception ex)
+        catch (DaoException ex)
         {
             logger.error("Error deleting SkiLesson", ex);
             throw new ApiException(404, "No content found for this request");
         }
+        catch (Exception ex)
+        {
+            logger.error("Error deleting SkiLesson", ex);
+            throw new ApiException(500, "Server error deleting ski lesson");
+        }
     }
 
-    // Get all lessons for a given instructor
     @Override
     public void getLessonsByInstructor(@NotNull Context ctx)
     {
         try
         {
-            long id = ctx.pathParamAsClass("id", Long.class)
-                    .check(i -> i > 0, "id must be at least 0")
+            long id = ctx.pathParamAsClass("id", Long.class).check(i -> i > 0, "id must be at least 0")
                     .getOrThrow((validator) -> new BadRequestResponse("Invalid id"));
             Instructor instructor = dao.getById(Instructor.class, id);
             ctx.status(200).json(instructor.getSkiLessons());
         }
-        catch (Exception ex)
+        catch (DaoException ex)
         {
             logger.error("Error getting lessons", ex);
             throw new ApiException(404, "No content found for this request");
         }
+        catch (Exception ex)
+        {
+            logger.error("Error getting lessons by instructor", ex);
+            throw new ApiException(500, "Server error getting ski lessons by instructor");
+        }
     }
 
-    // Add a lesson to a instructor
     @Override
     public void addLessonToInstructor(@NotNull Context ctx)
     {
@@ -202,8 +209,6 @@ public class SkiLessonController implements IController, ISkiLessonController
                     .check(i -> i > 0, "lessonId must be at least 0")
                     .getOrThrow((validator) -> new BadRequestResponse("Invalid skiLesson id"));
 
-            logger.info("Instructor ID: {}, SkiLesson ID: {}", instructorId, lessonId);
-
             Instructor instructor = dao.getById(Instructor.class, instructorId);
             SkiLesson skiLesson = dao.getLessonById(lessonId);
 
@@ -212,26 +217,26 @@ public class SkiLessonController implements IController, ISkiLessonController
                 throw new BadRequestResponse("Instructor or SkiLesson not found");
             }
 
-            logger.info("Instructor details before adding skiLesson: {}", instructor);
-            logger.info("SkiLesson details: {}", skiLesson);
-
             instructor.addLesson(skiLesson);
             skiLesson.setInstructor(instructor);
 
             dao.update(instructor);
             dao.update(skiLesson);
 
-            logger.info("Instructor details after adding skiLesson: {}", instructor);
             ctx.status(200).json(instructor.getSkiLessons());
         }
-        catch (Exception ex)
+        catch (DaoException ex)
         {
             logger.error("Error adding lesson", ex);
             throw new ApiException(400, "Error adding lesson");
         }
+        catch (Exception ex)
+        {
+            logger.error("Error assigning lesson to instructor", ex);
+            throw new ApiException(500, "Server error assigning lesson");
+        }
     }
 
-    // Filter lessons by level (via query param)
     @Override
     public void filterLessonsByLevel(Context ctx)
     {
@@ -265,15 +270,18 @@ public class SkiLessonController implements IController, ISkiLessonController
             logger.error("Invalid level", ex);
             ctx.status(400).json(new ErrorMessage(ex.getMessage()));
         }
+        catch (DaoException ex)
+        {
+            logger.error("Error filtering by level", ex);
+            throw new ApiException(404, "No content found for this request");
+        }
         catch (Exception ex)
         {
             logger.error("Error filtering lessons by level", ex);
-            throw new ApiException(404, "No content found for this request");
+            throw new ApiException(500, "Server error filtering lessons");
         }
     }
 
-
-    // Return total lesson price per instructor
     @Override
     public void getTotalLessonPricePerInstructor(Context ctx)
     {
@@ -282,14 +290,18 @@ public class SkiLessonController implements IController, ISkiLessonController
             List<InstructorSkiLessonTotalDTO> totals = dao.getTotalLessonPricePerInstructor();
             ctx.status(200).json(totals);
         }
+        catch (DaoException ex)
+        {
+            logger.error("Error calculating total price", ex);
+            throw new ApiException(404, "No content found for this request");
+        }
         catch (Exception ex)
         {
             logger.error("Error calculating total lesson price by instructor", ex);
-            throw new ApiException(404, "No content found for this request");
+            throw new ApiException(500, "Server error calculating total lesson price");
         }
     }
 
-    // Populate the database with demo data
     @Override
     public void populate(Context ctx)
     {
@@ -311,7 +323,6 @@ public class SkiLessonController implements IController, ISkiLessonController
         }
     }
 
-    // fetching instructions by level from the ski instruction service
     public void getInstructionsByLevel(Context ctx)
     {
         try
@@ -327,6 +338,11 @@ public class SkiLessonController implements IController, ISkiLessonController
         {
             throw new BadRequestResponse("Invalid level. Must be beginner, intermediate or advanced.");
         }
+        catch (DaoException ex)
+        {
+            logger.error("Error getting entity", ex);
+            throw new ApiException(404, "No content found for this request");
+        }
         catch (Exception e)
         {
             logger.error("Failed to get instructions by level", e);
@@ -334,12 +350,15 @@ public class SkiLessonController implements IController, ISkiLessonController
         }
     }
 
-    public void getTotalInstructionDurationByLessonId(Context ctx) {
-        try {
+    public void getTotalInstructionDurationByLessonId(Context ctx)
+    {
+        try
+        {
             long id = ctx.pathParamAsClass("id", Long.class).get();
             SkiLesson lesson = dao.getById(SkiLesson.class, id);
 
-            if (lesson == null) {
+            if (lesson == null)
+            {
                 throw new NotFoundResponse("No ski lesson found with ID: " + id);
             }
 
@@ -351,11 +370,16 @@ public class SkiLessonController implements IController, ISkiLessonController
             );
 
             ctx.status(200).json(response);
-        } catch (Exception e) {
+        }
+        catch (DaoException ex)
+        {
+            logger.error("Error getting entity", ex);
+            throw new ApiException(404, "No content found for this request");
+        }
+        catch (Exception e)
+        {
             logger.error("Error calculating total instruction duration", e);
             throw new ApiException(500, "Server error calculating instruction duration");
         }
     }
-
-
 }
