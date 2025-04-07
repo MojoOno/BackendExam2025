@@ -123,6 +123,19 @@ class SkiLessonResourceTest {
     }
 
     @Test
+    void getLessonByIdIncludingInstructions() {
+        given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get("/skilessons/" + lesson1.getId())
+                .then()
+                .statusCode(200)
+                .body("instructions", notNullValue())
+                .body("instructions.size()", greaterThan(0));
+    }
+
+
+    @Test
     void create() {
         SkiLessonDTO newLesson = new SkiLessonDTO();
         newLesson.setName("Test SkiLesson");
