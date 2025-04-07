@@ -326,15 +326,15 @@ public class SkiLessonController implements IController, ISkiLessonController
         }
     }
 
-    public void getTotalInstructionDurationByLessonId(Context ctx)
-    {
-        try
-        {
-            long id = ctx.pathParamAsClass("id", Long.class).get();
+    public void getTotalInstructionDurationByLessonId(Context ctx) {
+        try {
+            long id = ctx.pathParamAsClass("id", Long.class)
+                    .check(i -> i > 0, "id must be at least 0")
+                    .getOrThrow((validator) -> new BadRequestResponse("Invalid id"));
+
             SkiLesson lesson = dao.getById(SkiLesson.class, id);
 
-            if (lesson == null)
-            {
+            if (lesson == null) {
                 throw new NotFoundResponse("No ski lesson found with ID: " + id);
             }
 
@@ -346,16 +346,13 @@ public class SkiLessonController implements IController, ISkiLessonController
             );
 
             ctx.status(200).json(response);
-        }
-        catch (DaoException ex)
-        {
+        } catch (DaoException ex) {
             logger.error("Error getting entity", ex);
             throw new ApiException(404, "No content found for this request");
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             logger.error("Error calculating total instruction duration", e);
             throw new ApiException(500, "Server error calculating instruction duration");
         }
     }
+
 }
