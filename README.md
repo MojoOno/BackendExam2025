@@ -6,7 +6,16 @@ This is the prompt i gave it;
 Det jeg gerne vil have dig til er at formatere det, så det ser lækkert ud når man som læser ser den.
 Du må altså ikke ændre i det jeg har skrevet, eller tilføje noget nyt - tak!"
 ```
-# Setup
+
+## Github repo link: 
+https://github.com/MojoOno/BackendExam2025
+# Ski Lesson Planner
+This is a ski lesson planner API built with Java, Javalin, JPA, Hibernate, Postgres and REST.
+The application allows admins to manage ski lessons and instructors while users can see the available ski lessons
+and their instructors.
+Below is a more in depth description along with a setup guide for the application.
+Enjoy the read, and please let me know if you have any questions or feedback.
+## Setup
 
 > Remember to add a `config.properties` file in the `resources` directory.  
 > The `config.properties` file should contain the following properties:
