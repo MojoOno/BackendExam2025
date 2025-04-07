@@ -8,6 +8,7 @@ import dat.entities.SkiLesson;
 import dat.enums.Level;
 import dat.exceptions.ApiException;
 import dat.exceptions.DaoException;
+import dat.service.SkiInstructionService;
 import dat.utils.Populator;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 public class SkiLessonController implements IController, ISkiLessonController
 {
     private final SkiLessonDAO dao;
+    private final SkiInstructionService skiInstructionService = new SkiInstructionService();
     private static final Logger logger = LoggerFactory.getLogger(SkiLessonController.class);
     private final static EntityManagerFactory emf = HibernateConfig.getEntityManagerFactory();
 
@@ -297,4 +299,22 @@ public class SkiLessonController implements IController, ISkiLessonController
             em.close();
         }
     }
+
+    // fetching instructions by level from the ski instruction service
+    public void getInstructionsByLevel(Context ctx) {
+        try {
+            String levelParam = ctx.pathParam("level");
+            Level level = Level.valueOf(levelParam);
+
+            List<SkiInstructionDTO> instructions = skiInstructionService.getInstructionsByLevel(level);
+
+            ctx.status(200).json(instructions);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestResponse("Invalid level. Must be beginner, intermediate or advanced.");
+        } catch (Exception e) {
+            logger.error("Failed to get instructions by level", e);
+            throw new ApiException(500, "Server error fetching instructions");
+        }
+    }
+
 }

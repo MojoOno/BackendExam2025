@@ -516,7 +516,50 @@ Content-Length: 118
   }
 ]
 ```
+---
+### `GET http://localhost:7070/api/skilessons/instructions/advanced`
+```
+Date: Mon, 07 Apr 2025 10:00:44 GMT
+Content-Type: application/json
+Content-Length: 1060
+```
 
+```json
+[
+  {
+    "title": "Advanced Off-Piste Techniques",
+    "description": "Learn advanced techniques for skiing off-piste, focusing on safety and maneuvering.",
+    "level": "advanced",
+    "durationMinutes": 60,
+    "createdAt": "2024-10-30T17:44:58.547Z",
+    "updatedAt": "2024-10-30T17:44:58.547Z"
+  },
+  {
+    "title": "Advanced Carving Techniques",
+    "description": "Master carving turns for better control and precision while skiing on groomed slopes.",
+    "level": "advanced",
+    "durationMinutes": 60,
+    "createdAt": "2024-10-30T17:44:58.547Z",
+    "updatedAt": "2024-10-30T17:44:58.547Z"
+  },
+  {
+    "title": "Powder Skiing Techniques",
+    "description": "Learn the techniques for skiing on deep powder snow, focusing on body position and balance.",
+    "level": "advanced",
+    "durationMinutes": 75,
+    "createdAt": "2024-10-30T17:44:58.547Z",
+    "updatedAt": "2024-10-30T17:44:58.547Z"
+  },
+  {
+    "title": "Avalanche Awareness and Safety",
+    "description": "Gain essential knowledge and skills for avalanche safety and rescue operations in the backcountry.",
+    "level": "advanced",
+    "durationMinutes": 90,
+    "createdAt": "2024-10-30T17:44:58.547Z",
+    "updatedAt": "2024-10-30T17:44:58.547Z"
+  }
+]
+```
 ## 3.3.5 - Why use PUT?
 
 The goal is to add a instructor to a skiLesson. When we add that instructor we don’t want to create a new skiLesson, and then add the instructor.  
