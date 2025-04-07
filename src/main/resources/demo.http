@@ -1,0 +1,60 @@
+GET http://localhost:7070/api/routes
+#Authorization: Bearer {{token}}
+
+###
+GET http://localhost:7070/api/skilessons
+
+###
+GET localhost:7070/api/skilessons/3
+
+###
+POST http://localhost:7070/api/skilessons
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+
+{
+  "name": "Beginner Slope Basics",
+  "price": 250.0,
+  "level": "beginner",
+  "startTime": "2023-12-01",
+  "endTime": "2023-12-02",
+  "longitude": "10.1234",
+  "latitude": "56.7890"
+}
+
+###
+PUT http://localhost:7070/api/skilessons/7
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Beginner Slope Basics (kids)",
+  "price": 100.0,
+  "level": "beginner",
+  "startTime": "2023-12-01",
+  "endTime": "2023-12-02",
+  "longitude": "10.1234",
+  "latitude": "56.7890"
+}
+
+###
+DELETE http://localhost:7070/api/skilessons/7
+Authorization: Bearer {{token}}
+
+###
+PUT http://localhost:7070/api/skilessons/7/instructors/1
+#Authorization: Bearer {{token}}
+
+###
+GET http://localhost:7070/api/skilessons/level?level=advanced
+#Authorization: Bearer {{token}}
+
+###
+GET http://localhost:7070/api/skilessons/totalprice
+#Authorization: Bearer {{token}}
+
+###
+POST http://localhost:7070/api/skilessons/populate
+#Authorization: Bearer {{token}}
+
